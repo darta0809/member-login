@@ -1,0 +1,109 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>會員註冊</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet" type="text/css" href="css/theme.css"></link>
+	<!-- CSS和JS的根目錄都在static -->
+	<script type="text/javascript" src="js/myscripts.js"></script>
+	<!-- CSS和JS的根目錄都在static -->
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+	<script type="text/javascript">
+	
+		function checkusername() {
+			if ($("#username").val() != "") {
+
+				var data = { username : $("#username").val() };
+				
+				$.ajax({
+					url : "/checkusername",
+					cache : false,
+					async : false,
+					dataType : 'json',
+					type : 'POST',
+					contentType: "application/json;charset=utf-8",
+					data : JSON.stringify(data),
+					error : function(xhr) {
+						alert('Ajax request 發生錯誤');
+					},
+					success : function(response) {
+
+						if (response.success) {
+							$("#text").css({
+								"color" : "#FF3333"
+							}).text("帳號已被使用，請重新輸入");
+						} else {
+							$("#text").css({
+								"color" : "#00DD00"
+							}).text("此帳號可使用");
+						}
+					}
+				});
+			}
+		}
+		
+		function checkemail() {
+			if ($("#email").val() != "") {
+
+				var data = { email : $("#email").val() };
+				
+					$.ajax({
+							url : "/checkemail",
+							cache : false,
+							async : false,
+							dataType : 'json',
+							type : 'POST',
+							contentType: "application/json;charset=utf-8",
+							data : JSON.stringify(data),
+							error : function(xhr) {
+								alert('Ajax request 發生錯誤');
+							},
+							success : function(response) {
+
+								if(response.success){
+						        	$("#text1").css({"color":"#FF3333"}).text("email已被使用，請重新輸入");
+						        }else{
+						        	$("#text1").css({"color":"#00DD00"}).text("此email可使用");
+						        }
+							}
+					});
+			}
+		}
+		
+		function checkpassword() {
+			if ($("#password").val() != "" || $("#password2").val() != "") {
+				if ($("#password").val() != $("#password2").val()) {
+					$("#text2").text("密碼不一致!!");
+				}else{
+					$("#text2").text("沒問題!按下送出!");
+				}
+	
+			}
+		}
+	</script>
+</head>
+
+<body style="text-align: center">
+
+	<form th:action="@{/register}" method="post">
+		<h1>註冊會員</h1>
+		<br /> 
+		帳號： <input type="text" id="username" name="username" onblur="checkusername();" />
+		<div id="text"></div>
+		<!-- <input type="button" value="檢查帳號" onclick="checkusername()">  -->
+		<br /> 
+		信箱： <input type="text" id="email" name="email" onblur="checkemail();" />
+		<div id="text1"></div>
+		<br /> 
+		密碼： <input type="password" id="password" name="password" />
+		<br />
+		<br /> 
+		再次輸入密碼： <input type="password" id="password2" name="password2" onblur="checkpassword();" />
+		<div id="text2"></div>
+		<br /> 
+		<input type="submit" id="send" value="送出" /> 
+		<input type="reset" id="clear" value="清除" />
+	</form>
+</body>
+</html>

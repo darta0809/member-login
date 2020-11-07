@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>註冊會員成功</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet" type="text/css" href="css/theme.css"></link>
+	<!-- CSS和JS的根目錄都在static -->
+	<script type="text/javascript" src="js/myscripts.js"></script>
+	<!-- CSS和JS的根目錄都在static -->
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+</head>
+
+<body style="text-align: center">
+	<h1><span th:text="${username}"> 成功送出申請表單</h1>
+	請至填寫之信箱 <p th:text="${email}" /> 查看申請結果。
+	<br />
+	<br />
+	<a href="http://localhost:8080/">回首頁</a>
+</body>
+</html>

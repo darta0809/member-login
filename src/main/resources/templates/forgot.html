@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>忘記密碼</title>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script type="text/javascript">
+	
+		function checkusername() {
+			
+			if ($("#username").val() != "") {
+
+				var data = { username : $("#username").val() };
+				
+				$.ajax({
+					url : "/checkusername",
+					cache : false,
+					async : false,
+					dataType : 'json',
+					type : 'POST',
+					contentType: "application/json;charset=utf-8",
+					data : JSON.stringify(data),
+					error : function(xhr) {
+						alert('Ajax request 發生錯誤');
+					},
+					success : function(json) {
+						
+						if (!json.success) {
+							$("#text").css({
+								"color" : "#FF3333"
+							}).text("此帳號不存在，請重新輸入");
+						} else {
+							$("#text").text("");
+						}
+					}
+				});
+			}
+		}
+	</script>
+</head>
+<body>
+	<p>請輸入帳號，我們會寄送重設密碼的郵件給你！</p>
+	<form th:action="@{/changepassword}" method="POST">
+		<div id="text"></div>
+		<table>
+			<tr>
+				<td>
+					<input type="text" name="username" id="username" onblur="checkusername()" />
+				</td>
+				
+				<td>
+					<input type="submit" value="送出" />
+				</td>
+			</tr>
+		</table>
+	</form>
+</body>
+</html>
