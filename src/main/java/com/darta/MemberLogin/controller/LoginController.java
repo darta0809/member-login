@@ -102,7 +102,7 @@ public class LoginController {
 		String userName = request.getParameter("username");
 
 		// 忘記密碼
-		SendGmailService sendfrom = new SendGmailService("darta0809@gmail.com", "shit5205");
+		SendGmailService sendfrom = new SendGmailService("server@", "serverPassword");
 		String email = memberLoginService.getEmail(userName);
 
 		UserAccount user = new UserAccount();
