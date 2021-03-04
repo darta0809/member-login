@@ -7,18 +7,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class indexController {
 
-    @GetMapping("/")
-    public String index(){
-        return "index/index";
-    }
+  @GetMapping("/")
+  public String index() {
+    return "index/index";
+  }
 
-    @GetMapping("/login")
-    public String login(){
-        return "index/login";
-    }
+  @GetMapping("/login")
+  public String login() {
+    return "index/login";
+  }
 
-    @GetMapping("/logout")
-    public String logout(){
-        return "index/logout";
-    }
+  @GetMapping("/logout")
+  public String logout() {
+    return "index/logout";
+  }
+
+  @GetMapping("/welcome")
+  public String welcome() {
+    return "welcome.html";
+  }
 }

@@ -1,19 +1,19 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>登入成功</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link rel="stylesheet" type="text/css" href="css/theme.css"></link> <!-- CSS和JS的根目錄都在static -->
-    <script type="text/javascript" src="js/myscripts.js"></script> <!-- CSS和JS的根目錄都在static -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <title>登入成功</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <link rel="stylesheet" type="text/css" href="css/theme.css"> <!-- CSS和JS的根目錄都在static -->
+  <script type="text/javascript" src="js/myscripts.js"></script> <!-- CSS和JS的根目錄都在static -->
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 </head>
-<body style="text-align: center">
-	<h1>登入成功</h1>
-	<br>
-	<h2>親愛的<span th:text="${username}"></span></h2>
-	<h2>以下是您的個人資料</h2>
-	Email： <h2><p th:text="${email}" /></h2>
-	<br />
-	<a href="http://localhost:8080/">回首頁</a>
+<body>
+<h1 style="text-align: center">登入成功</h1>
+<br>
+<a th:href="@{/logout}">Logout</a><br/>
+<a th:href="@{/user/home}">Home</a><br/>
+<a th:href="@{/user/editor}">Editor</a><br/>
+<a th:href="@{/user/reviewer}">Reviewer</a><br/>
+<a th:href="@{/user/admin}">Admin</a><br/>
 </body>
 </html>

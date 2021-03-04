@@ -6,14 +6,14 @@
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 	<script type="text/javascript">
 	
-		function checkusername() {
+		function checkUsername() {
 			
 			if ($("#username").val() != "") {
 
 				var data = { username : $("#username").val() };
 				
 				$.ajax({
-					url : "/checkusername",
+					url : "/checkUsername",
 					cache : false,
 					async : false,
 					dataType : 'json',
@@ -40,12 +40,12 @@
 </head>
 <body>
 	<p>請輸入帳號，我們會寄送重設密碼的郵件給你！</p>
-	<form th:action="@{/changepassword}" method="POST">
+	<form th:action="@{/changePassword}" method="POST">
 		<div id="text"></div>
 		<table>
 			<tr>
 				<td>
-					<input type="text" name="username" id="username" onblur="checkusername()" />
+					<input type="text" name="username" id="username" onblur="checkUsername()" />
 				</td>
 				
 				<td>

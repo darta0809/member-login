@@ -26,8 +26,7 @@ public class DataSourceConfiguration implements TransactionManagementConfigurer 
     }
 	@Bean
 	public JdbcTemplate jdbcTemplate() throws SQLException, UnsupportedEncodingException {
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource());
-		return jdbcTemplate;
+		return new JdbcTemplate(dataSource());
 	}
 
 	@Bean

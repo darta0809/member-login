@@ -1,189 +1,204 @@
 package com.darta.MemberLogin.controller;
 
+import com.darta.MemberLogin.model.UUIDUtils;
+import com.darta.MemberLogin.model.UserAccount;
+import com.darta.MemberLogin.service.MemberLoginService;
+import com.darta.MemberLogin.service.SendGmailService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.darta.MemberLogin.model.UserAccount;
-import com.darta.MemberLogin.service.MemberLoginService;
-import com.darta.MemberLogin.service.SendGmailService;
-
-//@Controller
+@Controller
 public class LoginController {
 
-	@Autowired
-	private MemberLoginService memberLoginService;
+  @Autowired
+  private MemberLoginService memberLoginService;
 
-	@PostMapping(value = "/index")
-	public String login(ModelMap model, HttpServletRequest request) {
+  private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-		String password = request.getParameter("password");
-		String userName = request.getParameter("username");
-		String email = request.getParameter("email");
+  private String getPassword(String raw) {
+    return passwordEncoder.encode(raw);
+  }
 
-		password = DigestUtils.md5DigestAsHex(password.getBytes());
+  /*
+    // 登入檢查，成功 ==> welcome.html 失敗 ==> login_fail.html
+    // 目前使用 Spring security 自定義的頁面導向，此方法目前沒用到
+    @PostMapping(value = "/test")
+    public String login(ModelMap model, HttpServletRequest request) {
 
-		UserAccount userAccount = new UserAccount();
-		userAccount.setUserName(userName);
-		userAccount.setPassword(password);
-		userAccount.setEmail(email);
+      String password = request.getParameter("password");
+      String userName = request.getParameter("username");
+      String status = "";
 
-		Boolean result = memberLoginService.accountVerity(userAccount);
+      List<UserAccount> resultList = memberLoginService.checkUsername(userName);
 
-		if (result == true) {
-			List<UserAccount> resultList = memberLoginService.selectUserInfo(userName, password);
-			model.addAttribute("username", userName);
-			model.addAttribute("email", resultList.get(0).getEmail());
-			return "welcome.html";
-		} else {
-			return "login_fail.html";
-		}
-	}
+      boolean f = passwordEncoder.matches(password, resultList.get(0).getPassword());
 
-	@PostMapping(value = "/checkusername")
-	@ResponseBody
-	public Map<String, Object> checkAccount(@RequestBody Map<String, String> params) {
+      if(resultList.size() != 0) {
+        status = resultList.get(0).getStatus();
+      }
+      if(f && "1".equals(status)){
+        model.addAttribute("username", userName);
+        model.addAttribute("email", resultList.get(0).getEmail());
+        return "welcome.html";
+      }
+      return "/login?error";
+    }
+  */
 
-		String userName = params.get("username");
+  // 檢查帳號是否重複 AJAX
+  @PostMapping(value = "/checkUsername")
+  @ResponseBody
+  public Map<String, Object> checkAccount(@RequestBody Map<String, String> params) {
 
-		// 檢查帳號是否重複 AJAX
-		Boolean b = memberLoginService.checkAccount(userName);
-		System.out.println("檢查帳號是否重複");
-		System.out.println(b);
+    String userName = params.get("username");
 
-		Map<String, Object> map = new HashMap<>();
+    Boolean b = memberLoginService.checkAccount(userName);
+    System.out.println("檢查帳號是否重複");
+    System.out.println(b);
 
-		if (b) {
-			map.put("success", true);
-			return map;
-		} else {
-			map.put("success", false);
-			return map;
-		}
-	}
+    Map<String, Object> map = new HashMap<>();
 
-	@PostMapping(value = "/checkemail")
-	@ResponseBody
-	public Map<String, Object> checkemail(@RequestBody Map<String, String> params) {
+    if (b) {
+      map.put("success", true);
+    } else {
+      map.put("success", false);
+    }
+    return map;
+  }
 
-		String email = params.get("email");
+  // 檢查信箱是否重複 AJAX
+  @PostMapping(value = "/checkEmail")
+  @ResponseBody
+  public Map<String, Object> checkEmail(@RequestBody Map<String, String> params) {
 
-		Boolean b = memberLoginService.checkEmail(email);
+    String email = params.get("email");
 
-		System.out.println("檢查信箱是否重複");
-		System.out.println(b);
+    Boolean b = memberLoginService.checkEmail(email);
 
-		Map<String, Object> map = new HashMap<>();
+    System.out.println("檢查信箱是否重複");
+    System.out.println(b);
 
-		if (b) {
-			map.put("success", true);
-			return map;
-		} else {
-			map.put("success", false);
-			return map;
-		}
-	}
+    Map<String, Object> map = new HashMap<>();
 
-	@PostMapping(value = "/changepassword")
-	public String forgotPassword(ModelMap model, HttpServletRequest request) throws Exception {
+    if (b) {
+      map.put("success", true);
+    } else {
+      map.put("success", false);
+    }
+    return map;
+  }
 
-		String userName = request.getParameter("username");
+  // 忘記密碼
+  @PostMapping(value = "/changePassword")
+  public String forgotPassword(ModelMap model, HttpServletRequest request) throws Exception {
 
-		// 忘記密碼
-		SendGmailService sendfrom = new SendGmailService("server@", "serverPassword");
-		String email = memberLoginService.getEmail(userName);
+    String userName = request.getParameter("username");
 
-		UserAccount user = new UserAccount();
-		user.setUserName(userName);
-		user.setEmail(email);
+    SendGmailService sendFrom = new SendGmailService("darta0809@gmail.com", "shit5205");
+    String email = memberLoginService.getEmail(userName);
 
-		sendfrom.passwordResetLink(user);
+    UserAccount user = new UserAccount();
+    user.setUsername(userName);
+    user.setEmail(email);
 
-		model.addAttribute("email", email);
+    sendFrom.passwordResetLink(user);
 
-		return "forgot_password.html";
-	}
+    model.addAttribute("email", email);
 
-	@PostMapping(value = "/verify")
-	public String resetPassword_success(ModelMap model, HttpServletRequest request) throws Exception {
+    return "forgot_password.html";
+  }
 
-		String password = request.getParameter("password");
-		String userName = request.getParameter("username");
-		String email = request.getParameter("email");
+  // 重設密碼
+  @PostMapping(value = "/verify")
+  public String resetPassword_success(ModelMap model, HttpServletRequest request) throws Exception {
 
-		// 重設密碼
-		UserAccount user1 = new UserAccount();
-		password = DigestUtils.md5DigestAsHex(password.getBytes()); // 轉MD5
-		user1.setUserName(userName);
-		user1.setEmail(email);
-		user1.setPassword(password);
+    String password = getPassword(request.getParameter("password"));
+    String userName = request.getParameter("username");
 
-		memberLoginService.updatePassword(user1);
+    UserAccount user = new UserAccount();
+    user.setUsername(userName);
+    user.setPassword(password);
 
-		return "resetPassword_success.html";
-	}
+    memberLoginService.updatePassword(user);
 
-	@PostMapping(value = "/register")
-	public String registerSuccess(ModelMap model, HttpServletRequest request) throws Exception {
+    return "resetPassword_success.html";
+  }
 
-		String userName = request.getParameter("username");
-		String password = request.getParameter("password");
-		String email = request.getParameter("email");
+  // 註冊帳號
+  @PostMapping(value = "/register")
+  public String registerSuccess(ModelMap model, HttpServletRequest request) throws Exception {
 
-		// 註冊帳號
-		password = DigestUtils.md5DigestAsHex(password.getBytes());
-		UserAccount addUser = new UserAccount(userName, password, email);
-		SendGmailService sendfrom = new SendGmailService("darta0809@gmail.com", "shit5205");
-		sendfrom.validationLink(addUser);// 發驗證信
-		memberLoginService.createAccount(addUser);// 寫入資料庫
+    String userName = request.getParameter("username");
+    String password = getPassword(request.getParameter("password"));
+    String email = request.getParameter("email");
+    String code = UUIDUtils.getUUID();
 
-		model.addAttribute("username", userName);
-		model.addAttribute("email", email);
+    UserAccount addUser = new UserAccount(userName, password, email, code);
+    addUser.setStatus("0");
 
-		return "register_success.html";
-	}
+    SendGmailService sendFrom = new SendGmailService("darta0809@gmail.com", "shit5205");
+    sendFrom.validationLink(addUser);// 發驗證信
+    memberLoginService.createAccount(addUser);// 寫入資料庫
 
-	// 以下轉頁用
+    model.addAttribute("username", userName);
+    model.addAttribute("email", email);
 
-	// 忘記密碼
-	@GetMapping(value = "/resetpassword")
-	public String resetPassword() {
-		return "resetPassword.html";
-	}
+    return "register_success.html";
+  }
 
-	// 登入首頁
-	@GetMapping(value = "/login")
-	public String homepage() {
-		return "index.html";
-	}
+  // 註冊成功，開通帳號
+  @GetMapping(value = "/register_success")
+  public String register_success(String code) {
 
-	// 忘記密碼
-	@GetMapping(value = "/forgot")
-	public String forgot() {
-		return "forgot.html";
-	}
+    List<UserAccount> userAccountList = memberLoginService.checkCode(code);
 
-	// 註冊會員
-	@GetMapping(value = "/toregister")
-	public String toregister() {
-		return "register.html";
-	}
+    UserAccount userAccount = new UserAccount();
 
-	// 403
-	@RequestMapping("/403")
-	public String forbidden() {
-		return "403";
-	}
+    System.out.println("code 驗證碼 : " + code);
+    // 如果用戶不等於 null，將狀態改為 1 (開通
+    if (userAccountList.size() > 0) {
+      userAccount.setUsername(userAccountList.get(0).getUsername());
+      userAccount.setStatus("1");
+      // 將 code 驗證碼清空
+      userAccount.setCode("");
+      System.out.println(userAccount);
+      memberLoginService.updateUserStatus(userAccount);
+    }
+
+    return "verify.html";
+  }
+
+  // 以下轉頁用
+
+  // 忘記密碼
+  @GetMapping(value = "/resetPassword")
+  public String resetPassword(String username, Model model) {
+    model.addAttribute("username", username);
+    return "resetPassword.html";
+  }
+
+  // 忘記密碼
+  @GetMapping(value = "/forgot")
+  public String forgot() {
+    return "forgot.html";
+  }
+
+  // 註冊會員
+  @GetMapping(value = "/toRegister")
+  public String toRegister() {
+    return "register.html";
+  }
 }

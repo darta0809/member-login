@@ -1,13 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
-            </pattern>
-        </encoder>
-    </appender>
+<configuration scan="true" debug="false">
 
-    <root level="DEBUG">
-        <appender-ref ref="STDOUT" />
-    </root>
+    <!--格式化輸出：%d表示日期，%thread表示線程名，%-5level：級別從左顯示5個字符寬度%msg：日誌消息，%n是換行符-->
+    <property name="PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n" />
+    <!--文件路徑 -->
+    <property name="LOG_HOME" value="C:/Intellij_workspace/MemberLogin/"/>
+
+    <!-- 測試 正式 環境 -->
+    <springProfile name="dev,test,prod">
+        <!-- 每天產生一個文件 -->
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <!-- 文件名稱 -->
+                <fileNamePattern>${LOG_HOME}/memberLogin.%d{yyyy-MM-dd}.log</fileNamePattern>
+                <!-- 日誌最大的歷史 30天 -->
+                <MaxHistory>30</MaxHistory>
+            </rollingPolicy>
+            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <pattern>${PATTERN}</pattern>
+            </encoder>
+            <!--日誌文件最大的大小-->
+            <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+                <MaxFileSize>100MB</MaxFileSize>
+            </triggeringPolicy>
+        </appender>
+
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+                </pattern>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="STDOUT"/>
+        </root>
+
+    </springProfile>
 </configuration>

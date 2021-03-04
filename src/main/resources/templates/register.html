@@ -11,13 +11,13 @@
 
 	<script type="text/javascript">
 	
-		function checkusername() {
+		function checkUsername() {
 			if ($("#username").val() != "") {
 
 				var data = { username : $("#username").val() };
 				
 				$.ajax({
-					url : "/checkusername",
+					url : "/checkUsername",
 					cache : false,
 					async : false,
 					dataType : 'json',
@@ -28,7 +28,6 @@
 						alert('Ajax request 發生錯誤');
 					},
 					success : function(response) {
-
 						if (response.success) {
 							$("#text").css({
 								"color" : "#FF3333"
@@ -43,13 +42,13 @@
 			}
 		}
 		
-		function checkemail() {
+		function checkEmail() {
 			if ($("#email").val() != "") {
 
 				var data = { email : $("#email").val() };
 				
 					$.ajax({
-							url : "/checkemail",
+							url : "/checkEmail",
 							cache : false,
 							async : false,
 							dataType : 'json',
@@ -71,7 +70,7 @@
 			}
 		}
 		
-		function checkpassword() {
+		function checkPassword() {
 			if ($("#password").val() != "" || $("#password2").val() != "") {
 				if ($("#password").val() != $("#password2").val()) {
 					$("#text2").text("密碼不一致!!");
@@ -89,17 +88,16 @@
 	<form th:action="@{/register}" method="post">
 		<h1>註冊會員</h1>
 		<br /> 
-		帳號： <input type="text" id="username" name="username" onblur="checkusername();" />
+		帳號： <input type="text" id="username" name="username" onblur="checkUsername();" />
 		<div id="text"></div>
-		<!-- <input type="button" value="檢查帳號" onclick="checkusername()">  -->
 		<br /> 
-		信箱： <input type="text" id="email" name="email" onblur="checkemail();" />
+		信箱： <input type="text" id="email" name="email" onblur="checkEmail();" />
 		<div id="text1"></div>
 		<br /> 
 		密碼： <input type="password" id="password" name="password" />
 		<br />
 		<br /> 
-		再次輸入密碼： <input type="password" id="password2" name="password2" onblur="checkpassword();" />
+		再次輸入密碼： <input type="password" id="password2" name="password2" onblur="checkPassword();" />
 		<div id="text2"></div>
 		<br /> 
 		<input type="submit" id="send" value="送出" /> 
