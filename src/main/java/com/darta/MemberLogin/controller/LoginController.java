@@ -32,32 +32,6 @@ public class LoginController {
     return passwordEncoder.encode(raw);
   }
 
-  /*
-    // 登入檢查，成功 ==> welcome.html 失敗 ==> login_fail.html
-    // 目前使用 Spring security 自定義的頁面導向，此方法目前沒用到
-    @PostMapping(value = "/test")
-    public String login(ModelMap model, HttpServletRequest request) {
-
-      String password = request.getParameter("password");
-      String userName = request.getParameter("username");
-      String status = "";
-
-      List<UserAccount> resultList = memberLoginService.checkUsername(userName);
-
-      boolean f = passwordEncoder.matches(password, resultList.get(0).getPassword());
-
-      if(resultList.size() != 0) {
-        status = resultList.get(0).getStatus();
-      }
-      if(f && "1".equals(status)){
-        model.addAttribute("username", userName);
-        model.addAttribute("email", resultList.get(0).getEmail());
-        return "welcome.html";
-      }
-      return "/login?error";
-    }
-  */
-
   // 檢查帳號是否重複 AJAX
   @PostMapping(value = "/checkUsername")
   @ResponseBody
