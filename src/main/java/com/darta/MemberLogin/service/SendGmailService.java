@@ -32,8 +32,8 @@ public class SendGmailService {
     props.put("mail.smtp.port", 587);
     // 此方式並不是最好的寫法
     props.put("mail.smtp.ssl.trust", "*");
-    this.mailUser = mailUser;// darta0809@gmail.com
-    this.mailPassword = mailPassword;// aa784512
+    this.mailUser = mailUser;
+    this.mailPassword = mailPassword;
   }
 
   /*
