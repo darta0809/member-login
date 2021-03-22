@@ -1,12 +1,9 @@
 package com.darta.MemberLogin.model;
 
 import java.util.ArrayList;
-import lombok.Data;
+import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-
-import java.util.Collection;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUser extends UserAccount implements UserDetails {

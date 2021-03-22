@@ -1,21 +1,17 @@
 package com.darta.MemberLogin.controller;
 
 import com.darta.MemberLogin.model.CustomUser;
-import com.darta.MemberLogin.model.UserAccount;
 import com.darta.MemberLogin.security.IsAdmin;
 import com.darta.MemberLogin.security.IsEditor;
 import com.darta.MemberLogin.security.IsReviewer;
 import com.darta.MemberLogin.security.IsUser;
+import java.security.Principal;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.security.Principal;
 
 @IsUser // 表明控制器下所有請求都需要登入後才能訪問
 @Controller

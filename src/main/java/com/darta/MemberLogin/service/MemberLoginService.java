@@ -3,10 +3,9 @@ package com.darta.MemberLogin.service;
 import com.darta.MemberLogin.dao.MemberLoginDao;
 import com.darta.MemberLogin.model.CustomUser;
 import com.darta.MemberLogin.model.UserAccount;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class MemberLoginService {
@@ -21,7 +20,7 @@ public class MemberLoginService {
 
   // 驗證帳號
   public Boolean accountVerity(UserAccount userAccount) {
-    return memberLoginDao.accountVerity(userAccount);
+    return memberLoginDao.validateAccount(userAccount);
   }
 
   // 修改密碼
@@ -55,7 +54,7 @@ public class MemberLoginService {
   }
 
   // 用驗證碼去撈取帳戶
-  public List<UserAccount> checkCode(String code) {
+  public String checkCode(String code) {
     return memberLoginDao.checkCode(code);
   }
 

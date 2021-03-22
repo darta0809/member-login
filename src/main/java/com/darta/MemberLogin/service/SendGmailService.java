@@ -1,10 +1,10 @@
 package com.darta.MemberLogin.service;
 
+import com.darta.MemberLogin.model.UserAccount;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Properties;
-
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -17,8 +17,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-
-import com.darta.MemberLogin.model.UserAccount;
 
 public class SendGmailService {
 
@@ -38,15 +36,16 @@ public class SendGmailService {
     this.mailPassword = mailPassword;// aa784512
   }
 
+  /*
+   * 開通帳戶連結
+   * */
   public void validationLink(UserAccount user) {
 
     String code = user.getCode();
     System.out.println("code : " + code);
     try {
       String link = String.format("http://localhost:8081/register_success?code=%s", code);
-
       String anchor = String.format("<a href='%s'>驗證郵件</a>", link);
-
       String html = String.format("請按 %s 啟用帳戶或複製鏈結至網址列：<br><br> %s", anchor, link);
 
       Message message = createMessage(mailUser, user.getEmail(), "註冊結果", html);
@@ -56,6 +55,9 @@ public class SendGmailService {
     }
   }
 
+  /*
+   * 建立信件內文
+   * */
   private Message createMessage(String from, String to, String subject, String text)
       throws MessagingException, AddressException, IOException {
 
@@ -80,6 +82,9 @@ public class SendGmailService {
     return message;
   }
 
+  /*
+   * html 格式
+   * */
   private Multipart multiPart(String text) throws MessagingException, UnsupportedEncodingException, IOException {
 
     MimeBodyPart htmlPart = new MimeBodyPart();
@@ -91,19 +96,19 @@ public class SendGmailService {
     return multiPart;
   }
 
+  /*
+   * 重設密碼連結
+   * */
   public void passwordResetLink(UserAccount user) {
 
     try {
       String link = String.format("http://localhost:8081/resetPassword?username=%s", user.getUsername());
-
       String anchor = String.format("<a href='%s'>前往更改密碼</a>", link);
-
       String html = String.format("請按 %s 更改密碼或複製鏈結至網址列：<br><br> %s", anchor, link);
 
       Message message = createMessage(mailUser, user.getEmail(), "更改密碼", html);
 
       Transport.send(message);
-
     } catch (MessagingException | IOException e) {
       throw new RuntimeException(e);
     }

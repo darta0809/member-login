@@ -2,6 +2,7 @@ package com.darta.MemberLogin.dao;
 
 import com.darta.MemberLogin.model.CustomUser;
 import com.darta.MemberLogin.model.UserAccount;
+import java.util.List;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -10,24 +11,12 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Log4j2
 @Repository
 public class MemberLoginDao {
 
   @Autowired
   private JdbcTemplate jdbcTemplate;
-
-  // 取得 ID，由 ACCOUNT_SQ 取得 seq
-  private String getSeq() {
-
-    log.info(">>>>> Get ACCOUNT_SEQ <<<<<");
-
-    String sql = "SELECT ";
-
-    return null;
-  }
 
   // 註冊帳號
   public void createAccount(UserAccount userAccount) {
@@ -42,7 +31,7 @@ public class MemberLoginDao {
   }
 
   // 驗證帳號密碼
-  public Boolean accountVerity(UserAccount userAccount) {
+  public Boolean validateAccount(UserAccount userAccount) {
 
     String sql = "SELECT COUNT(*) FROM ACCOUNT "
         + "WHERE USERNAME = ? "
@@ -73,7 +62,7 @@ public class MemberLoginDao {
 
   }
 
-  // 檢查是否已註冊
+  // 檢查帳號是否已註冊
   public Boolean checkAccount(String username) {
 
     String sql = "SELECT COUNT(*) FROM ACCOUNT "
@@ -161,7 +150,7 @@ public class MemberLoginDao {
 
     List<UserAccount> resultList = jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(UserAccount.class));
 
-    String status = resultList.get(0).getStatus();
+    String status = resultList.get(0) == null ? null : resultList.get(0).getStatus();
 
     return "1".equals(status);
   }
@@ -170,10 +159,10 @@ public class MemberLoginDao {
    * 根據驗證碼去尋找帳戶
    * 用途 : 將該帳戶做開通動作
    */
-  public List<UserAccount> checkCode(String code) {
+  public String checkCode(String code) {
 
-    String sql = "SELECT * FROM ACCOUNT WHERE CODE = '" + code + "'";
+    String sql = "SELECT USERNAME FROM ACCOUNT WHERE CODE = '" + code + "'";
 
-    return jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(UserAccount.class));
+    return jdbcTemplate.queryForObject(sql, String.class);
   }
 }

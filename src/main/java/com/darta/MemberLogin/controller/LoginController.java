@@ -4,6 +4,9 @@ import com.darta.MemberLogin.model.UUIDUtils;
 import com.darta.MemberLogin.model.UserAccount;
 import com.darta.MemberLogin.service.MemberLoginService;
 import com.darta.MemberLogin.service.SendGmailService;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,11 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @Controller
 public class LoginController {
 
@@ -28,50 +26,24 @@ public class LoginController {
 
   private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-  private String getPassword(String raw) {
+  private String getPasswordEncoder(String raw) {
     return passwordEncoder.encode(raw);
   }
-
-  /*
-    // 登入檢查，成功 ==> welcome.html 失敗 ==> login_fail.html
-    // 目前使用 Spring security 自定義的頁面導向，此方法目前沒用到
-    @PostMapping(value = "/test")
-    public String login(ModelMap model, HttpServletRequest request) {
-
-      String password = request.getParameter("password");
-      String userName = request.getParameter("username");
-      String status = "";
-
-      List<UserAccount> resultList = memberLoginService.checkUsername(userName);
-
-      boolean f = passwordEncoder.matches(password, resultList.get(0).getPassword());
-
-      if(resultList.size() != 0) {
-        status = resultList.get(0).getStatus();
-      }
-      if(f && "1".equals(status)){
-        model.addAttribute("username", userName);
-        model.addAttribute("email", resultList.get(0).getEmail());
-        return "welcome.html";
-      }
-      return "/login?error";
-    }
-  */
 
   // 檢查帳號是否重複 AJAX
   @PostMapping(value = "/checkUsername")
   @ResponseBody
   public Map<String, Object> checkAccount(@RequestBody Map<String, String> params) {
 
-    String userName = params.get("username");
+    String username = params.get("username");
 
-    Boolean b = memberLoginService.checkAccount(userName);
+    Boolean result = memberLoginService.checkAccount(username);
     System.out.println("檢查帳號是否重複");
-    System.out.println(b);
+    System.out.println(result);
 
     Map<String, Object> map = new HashMap<>();
 
-    if (b) {
+    if (result) {
       map.put("success", true);
     } else {
       map.put("success", false);
@@ -86,19 +58,19 @@ public class LoginController {
 
     String email = params.get("email");
 
-    Boolean b = memberLoginService.checkEmail(email);
+    Boolean result = memberLoginService.checkEmail(email);
 
     System.out.println("檢查信箱是否重複");
-    System.out.println(b);
+    System.out.println(result);
 
-    Map<String, Object> map = new HashMap<>();
+    Map<String, Object> ajaxResult = new HashMap<>();
 
-    if (b) {
-      map.put("success", true);
+    if (result) {
+      ajaxResult.put("success", true);
     } else {
-      map.put("success", false);
+      ajaxResult.put("success", false);
     }
-    return map;
+    return ajaxResult;
   }
 
   // 忘記密碼
@@ -125,7 +97,7 @@ public class LoginController {
   @PostMapping(value = "/verify")
   public String resetPassword_success(ModelMap model, HttpServletRequest request) throws Exception {
 
-    String password = getPassword(request.getParameter("password"));
+    String password = getPasswordEncoder(request.getParameter("password"));
     String userName = request.getParameter("username");
 
     UserAccount user = new UserAccount();
@@ -142,7 +114,7 @@ public class LoginController {
   public String registerSuccess(ModelMap model, HttpServletRequest request) throws Exception {
 
     String userName = request.getParameter("username");
-    String password = getPassword(request.getParameter("password"));
+    String password = getPasswordEncoder(request.getParameter("password"));
     String email = request.getParameter("email");
     String code = UUIDUtils.getUUID();
 
@@ -163,14 +135,14 @@ public class LoginController {
   @GetMapping(value = "/register_success")
   public String register_success(String code) {
 
-    List<UserAccount> userAccountList = memberLoginService.checkCode(code);
+    String username = memberLoginService.checkCode(code);
 
     UserAccount userAccount = new UserAccount();
 
     System.out.println("code 驗證碼 : " + code);
     // 如果用戶不等於 null，將狀態改為 1 (開通
-    if (userAccountList.size() > 0) {
-      userAccount.setUsername(userAccountList.get(0).getUsername());
+    if (!username.isEmpty()) {
+      userAccount.setUsername(username);
       userAccount.setStatus("1");
       // 將 code 驗證碼清空
       userAccount.setCode("");
