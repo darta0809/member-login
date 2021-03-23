@@ -79,7 +79,7 @@ public class LoginController {
 
     String userName = request.getParameter("username");
 
-    SendGmailService sendFrom = new SendGmailService("darta0809@gmail.com", "shit5205");
+    SendGmailService sendFrom = new SendGmailService("email", "password");
     String email = memberLoginService.getEmail(userName);
 
     UserAccount user = new UserAccount();
@@ -121,7 +121,7 @@ public class LoginController {
     UserAccount addUser = new UserAccount(userName, password, email, code);
     addUser.setStatus("0");
 
-    SendGmailService sendFrom = new SendGmailService("darta0809@gmail.com", "shit5205");
+    SendGmailService sendFrom = new SendGmailService("email", "password");
     sendFrom.validationLink(addUser);// 發驗證信
     memberLoginService.createAccount(addUser);// 寫入資料庫
 
