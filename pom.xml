@@ -92,13 +92,6 @@
       <optional>true</optional>
     </dependency>
 
-    <!-- Oracle -->
-    <dependency>
-      <groupId>com.oracle</groupId>
-      <artifactId>ojdbc8</artifactId>
-      <version>12.2.0.1</version>
-    </dependency>
-
     <!-- LOG4J2 -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
