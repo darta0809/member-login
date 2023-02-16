@@ -7,7 +7,7 @@ import com.darta.MemberLogin.service.SendGmailService;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -19,11 +19,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
+@RequiredArgsConstructor
 public class LoginController {
 
-  @Autowired
-  private MemberLoginService memberLoginService;
-
+  private final MemberLoginService memberLoginService;
   private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
   private String getPasswordEncoder(String raw) {
@@ -65,26 +64,20 @@ public class LoginController {
 
     Map<String, Object> ajaxResult = new HashMap<>();
 
-    if (result) {
-      ajaxResult.put("success", true);
-    } else {
-      ajaxResult.put("success", false);
-    }
+    ajaxResult.put("success", Boolean.TRUE.equals(result));
     return ajaxResult;
   }
 
   // 忘記密碼
   @PostMapping(value = "/changePassword")
-  public String forgotPassword(ModelMap model, HttpServletRequest request) throws Exception {
+  public String forgotPassword(ModelMap model, HttpServletRequest request) {
 
     String userName = request.getParameter("username");
 
     SendGmailService sendFrom = new SendGmailService("email", "password");
     String email = memberLoginService.getEmail(userName);
 
-    UserAccount user = new UserAccount();
-    user.setUsername(userName);
-    user.setEmail(email);
+    UserAccount user = UserAccount.builder().username(userName).email(email).build();
 
     sendFrom.passwordResetLink(user);
 
@@ -95,14 +88,12 @@ public class LoginController {
 
   // 重設密碼
   @PostMapping(value = "/verify")
-  public String resetPassword_success(ModelMap model, HttpServletRequest request) throws Exception {
+  public String resetPassword_success(ModelMap model, HttpServletRequest request) {
 
     String password = getPasswordEncoder(request.getParameter("password"));
     String userName = request.getParameter("username");
 
-    UserAccount user = new UserAccount();
-    user.setUsername(userName);
-    user.setPassword(password);
+    UserAccount user = UserAccount.builder().username(userName).password(password).build();
 
     memberLoginService.updatePassword(user);
 
@@ -111,7 +102,7 @@ public class LoginController {
 
   // 註冊帳號
   @PostMapping(value = "/register")
-  public String registerSuccess(ModelMap model, HttpServletRequest request) throws Exception {
+  public String registerSuccess(ModelMap model, HttpServletRequest request) {
 
     String userName = request.getParameter("username");
     String password = getPasswordEncoder(request.getParameter("password"));
@@ -132,20 +123,17 @@ public class LoginController {
   }
 
   // 註冊成功，開通帳號
-  @GetMapping(value = "/register_success")
-  public String register_success(String code) {
+  @GetMapping(value = "/verify")
+  public String verify(String code) {
 
     String username = memberLoginService.checkCode(code);
-
-    UserAccount userAccount = new UserAccount();
 
     System.out.println("code 驗證碼 : " + code);
     // 如果用戶不等於 null，將狀態改為 1 (開通
     if (!username.isEmpty()) {
-      userAccount.setUsername(username);
-      userAccount.setStatus("1");
-      // 將 code 驗證碼清空
-      userAccount.setCode("");
+      UserAccount userAccount = UserAccount.builder().username(username).status("1")
+          // 將 code 驗證碼清空
+          .code("").build();
       System.out.println(userAccount);
       memberLoginService.updateUserStatus(userAccount);
     }

@@ -19,27 +19,22 @@ public class DataSourceConfiguration implements TransactionManagementConfigurer 
 
   @Bean
   @ConfigurationProperties("spring.datasource")
-  DataSource dataSource() throws SQLException, UnsupportedEncodingException {
+  DataSource dataSource() {
     return DataSourceBuilder.create().build();
   }
 
   @Bean
-  public JdbcTemplate jdbcTemplate() throws SQLException, UnsupportedEncodingException {
+  public JdbcTemplate jdbcTemplate() {
     return new JdbcTemplate(dataSource());
   }
 
   @Bean
-  public PlatformTransactionManager txManager() throws SQLException, UnsupportedEncodingException {
+  public PlatformTransactionManager txManager()  {
     return new DataSourceTransactionManager(dataSource());
   }
 
   @Override
   public PlatformTransactionManager annotationDrivenTransactionManager() {
-    try {
       return txManager();
-    } catch (SQLException | UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
-    return null;
   }
 }

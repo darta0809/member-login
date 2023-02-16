@@ -3,8 +3,8 @@ package com.darta.MemberLogin.dao;
 import com.darta.MemberLogin.model.CustomUser;
 import com.darta.MemberLogin.model.UserAccount;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -13,10 +13,10 @@ import org.springframework.stereotype.Repository;
 
 @Log4j2
 @Repository
+@RequiredArgsConstructor
 public class MemberLoginDao {
 
-  @Autowired
-  private JdbcTemplate jdbcTemplate;
+  private final JdbcTemplate jdbcTemplate;
 
   // 註冊帳號
   public void createAccount(UserAccount userAccount) {
@@ -26,7 +26,8 @@ public class MemberLoginDao {
     String sql = "INSERT INTO ACCOUNT (ID, USERNAME, PASSWORD, EMAIL, STATUS, CODE) "
         + "VALUES (ACCOUNT_SQ.NEXTVAL,?,?,?,?,?)";
 
-    jdbcTemplate.update(sql, userAccount.getUsername(), userAccount.getPassword(), userAccount.getEmail(),
+    jdbcTemplate.update(sql, userAccount.getUsername(), userAccount.getPassword(),
+        userAccount.getEmail(),
         userAccount.getStatus(), userAccount.getCode());
   }
 
@@ -134,7 +135,8 @@ public class MemberLoginDao {
         + "SET STATUS = ? , CODE = ? "
         + "WHERE USERNAME = ? ";
 
-    jdbcTemplate.update(sql, userAccount.getStatus(), userAccount.getCode(), userAccount.getUsername());
+    jdbcTemplate.update(sql, userAccount.getStatus(), userAccount.getCode(),
+        userAccount.getUsername());
   }
 
   /**
@@ -148,7 +150,8 @@ public class MemberLoginDao {
         + "WHERE ID =  '" + userAccount.getId() + "' "
         + "AND USERNAME = '" + userAccount.getUsername() + "' ";
 
-    List<UserAccount> resultList = jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(UserAccount.class));
+    List<UserAccount> resultList = jdbcTemplate.query(sql,
+        BeanPropertyRowMapper.newInstance(UserAccount.class));
 
     String status = resultList.get(0) == null ? null : resultList.get(0).getStatus();
 
@@ -156,8 +159,7 @@ public class MemberLoginDao {
   }
 
   /**
-   * 根據驗證碼去尋找帳戶
-   * 用途 : 將該帳戶做開通動作
+   * 根據驗證碼去尋找帳戶 用途 : 將該帳戶做開通動作
    */
   public String checkCode(String code) {
 

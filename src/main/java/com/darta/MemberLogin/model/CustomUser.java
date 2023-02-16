@@ -2,16 +2,15 @@ package com.darta.MemberLogin.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+@NoArgsConstructor
 public class CustomUser extends UserAccount implements UserDetails {
 
   private static final long serialVersionUID = 1L;
-
-  public CustomUser() {
-  }
 
   public CustomUser(UserAccount user) {
     if (user != null) {
